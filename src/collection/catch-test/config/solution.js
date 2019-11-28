@@ -12,8 +12,8 @@
 					name: 'clang',
 					options: '-Wall'
 				},
-				entry: 'index.cpp',
-				files: ['math-functions/**/*.cpp'],
+				entry: 'tests-main.cpp',
+				files: ['factorial/*.cpp'],
 				dependencyPaths: [
 					'cpp_modules/catch'
 				],

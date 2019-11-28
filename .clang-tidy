@@ -1,1 +1,9 @@
-Checks: '*'
+{
+   "Checks":"*",
+   "CheckOptions":[
+      {
+         "key":"header-filter",
+         "value":".*"
+      }
+   ]
+}

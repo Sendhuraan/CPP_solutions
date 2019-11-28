@@ -364,17 +364,26 @@
 	}
 
 	async function runSolution(cb) {
-		var outputPath = config.node.bundle.output.path;
+		var outputPath = config.build.dirs.output;
 		var { file } = config.node.bundle.output;
 		// var { dir } = config.run;
 		var solutionProcess;
 
-		let { stdout, stderr } = await exec_promise(`${file}`, {
+		const solution = child_process.spawn(`${file}`, ['--success'], {
 			cwd: path.resolve(outputPath)
 		});
 
-		console.error(stderr);
-		console.log(stdout);
+		solution.stdout.on('data', (data) => {
+			console.log(`stdout: ${data}`);
+		});
+
+		solution.stderr.on('data', (data) => {
+			console.error(`stderr: ${data}`);
+		});
+
+		solution.on('close', (code) => {
+			console.log(`child process exited with code ${code}`);
+		});
 
 
 		// if(!DEBUG_PORT) {

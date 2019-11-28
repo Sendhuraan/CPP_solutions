@@ -86,7 +86,6 @@
 				})(NODE_LINT_PATTERN__PARAM, SOURCE_DIR);
 
 				var NODE_LINT_FILES = (function(files, inputDir) {
-					console.log(globby.sync(files));
 					return globby.sync(files).reduce(function(filesStr, file) {
 						filesStr += `${file} `;
 						return filesStr;
@@ -311,9 +310,10 @@
 		}
 
 		if(isNodeBundle) {
-			var NODE_BUNDLE_ENTRY__PARAM 		= solutionConfig.node.bundle.entry;
-			var NODE_BUNDLE_FILES__PARAM 		= solutionConfig.node.bundle.files;
-			var NODE_BUNDLE_OUTPUT_FILE__PARAM 	= solutionConfig.node.bundle.output.file;
+			var NODE_BUNDLE_ENTRY__PARAM 			= solutionConfig.node.bundle.entry;
+			var NODE_BUNDLE_FILES__PARAM 			= solutionConfig.node.bundle.files;
+			var NODE_BUNDLE_DEPENDENCY_PATHS__PARAM = solutionConfig.node.bundle.dependencyPaths;
+			var NODE_BUNDLE_OUTPUT_FILE__PARAM 		= solutionConfig.node.bundle.output.file;
 
 			var NODE_BUNDLE_ENTRY = (function(param, inputDir) {
 				return `${inputDir}/${param}`;
@@ -338,12 +338,21 @@
 				return `${inputDir}/${param}`;
 			})(NODE_BUNDLE_OUTPUT_FILE, OUTPUT_DIR);
 
+			var NODE_BUNDLE_DEPENDENCY_PATHS = (function(paths, inputDir) {
+				return paths.map(function(pathStr) {
+					return path.resolve(`${pathStr}`);
+				})
+				.reduce(function(pathsStr, path) {
+					pathsStr += `${path} `;
+					return pathsStr;
+				}, '');
+			})(NODE_BUNDLE_DEPENDENCY_PATHS__PARAM, SOURCE_DIR);
 
-			var nodeBundleConfig = (function(config, entry, files, outputDir, outputFile) {
+			var nodeBundleConfig = (function(config, entry, files, dependencies, outputDir, outputFile) {
 				let output = `${outputDir}/${outputFile}`;
 				var newConfig = Object.assign({}, config);
 
-				newConfig.command = `${config.compiler.name} ${config.compiler.options} ${entry} ${files} -o ${output}`;
+				newConfig.command = `${config.compiler.name} ${config.compiler.options} -I${dependencies} ${entry} ${files} -o ${output}`;
 				// newConfig.entry = path.resolve(entry);
 				newConfig.output.path = path.resolve(outputDir);
 				newConfig.output.filename = outputFile;
@@ -354,7 +363,7 @@
 
 				return newConfig;
 
-			})(solutionConfig.node.bundle, NODE_BUNDLE_ENTRY, NODE_BUNDLE_FILES, NODE_BUNDLE_OUTPUT_DIR, NODE_BUNDLE_OUTPUT_FILE);
+			})(solutionConfig.node.bundle, NODE_BUNDLE_ENTRY, NODE_BUNDLE_FILES, NODE_BUNDLE_DEPENDENCY_PATHS, NODE_BUNDLE_OUTPUT_DIR, NODE_BUNDLE_OUTPUT_FILE);
 
 		}
 

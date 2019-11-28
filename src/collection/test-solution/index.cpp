@@ -1,5 +1,5 @@
 #include "math-functions/functions.h"
-#include <stdio.h>
+#include <iostream>
 
 int main(void) {
     start();
